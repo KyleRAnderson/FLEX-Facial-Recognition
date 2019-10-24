@@ -1,0 +1,3 @@
+"""
+Authenticates a user.
+"""
