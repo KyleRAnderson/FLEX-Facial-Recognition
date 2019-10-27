@@ -38,21 +38,20 @@ def determine_identity(face_encoding, known_faces):
     """Determines the most likely identity of a single face. Returns the user id."""
     matches = face_recognition.compare_faces(
         known_faces["encodings"], face_encoding)
-    matched_user = None
+    matched_user = ''
+    matched_user_id_count = {}
 
     # If there is at least one match to a face in the database, figure out which one it is.
     if True in matches:
-        matched_user_id_count = {}
         matched_users = [user_index for (
             user_index, is_match) in enumerate(matches) if is_match]
 
         for i in matched_users:
             user_id: str = known_faces["user_ids"][i]
-            matched_user_id_count[user_id] = matched_user_id_count.get(
-                user_id, 0) + 1
+            matched_user_id_count[user_id] = matched_user_id_count.get(user_id, 0) + 1
 
     matched_user: str = max(matched_user_id_count,
-                            keys=matched_user_id_count.get())
+                            key=matched_user_id_count.get)
     return matched_user
 
 
@@ -64,6 +63,7 @@ def check_recognized_users(recognized_user_counts):
         if count >= MIN_USER_RECOGNITION_COUNT:
             recognized_users.append(user_id)
     return recognized_users
+
 
 def draw_rectanges_and_user_ids(image_frame, conversion: float, boxes, user_ids: list):
     """Draws the rectangles and user_ids onto the video stream so anyone viewing the stream could see them."""
@@ -79,6 +79,7 @@ def draw_rectanges_and_user_ids(image_frame, conversion: float, boxes, user_ids:
         y = top - 15 if top - 15 > 15 else top + 15
         cv2.putText(image_frame, user_id, (left, y), cv2.FONT_HERSHEY_PLAIN, 0.75, (0, 255, 0), 2)
     display_frame(image_frame)
+
 
 def display_frame(frame):
     """Displays the frame to the user."""
@@ -98,8 +99,8 @@ def recognize_user():
 
     # Determine the time at which we will time out. Equal to current time + timeout.
     timeout_time: float = time.time() + TIMEOUT
-    while (time.time() < timeout_time and not user_recognized):
-        # Read a image_frame from the videostream.
+    while time.time() < timeout_time and not user_recognized:
+        # Read a image_frame from the video stream.
         image_frame = video_stream.read()
 
         # Convert input from BGR to RGB
@@ -130,7 +131,7 @@ def recognize_user():
             break
 
     recognized_user = max(recognized_users_count,
-                          keys=recognized_users_count.get())
+                          key=recognized_users_count.get)
     if recognized_users_count[recognized_user] < MIN_USER_RECOGNITION_COUNT:
         recognized_user = None
     return recognized_user
