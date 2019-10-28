@@ -11,8 +11,12 @@ def load_database(file_location: str):
     :param file_location: String location of file to be loaded.
     :return: The loaded pickle database.
     """
-    with open(file_location, "rb") as database:
-        file_content = pickle.load(database)
+    file_content = {}
+    try:
+        with open(file_location, "rb") as database:
+            file_content = pickle.load(database)
+    except (FileNotFoundError, EOFError):
+        file_content = {}
     return file_content
 
 
@@ -23,5 +27,6 @@ def write_database(output_file: str, database_content: dict) -> None:
     :param database_content: The database content to be written to the file.
     :return: None
     """
-    with open(output_file, "wb") as output:
-        output.write(pickle.dump(database_content, output))
+    if output_file and database_content and database_content is not None:
+        with open(output_file, "wb") as output:
+            output.write(pickle.dump(database_content, output))

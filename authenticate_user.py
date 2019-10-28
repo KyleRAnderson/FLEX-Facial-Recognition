@@ -116,7 +116,7 @@ def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: i
         recognized_users = check_recognized_users(recognized_users_count)
         if len(recognized_users) > 0:
             break
-        cv2.waitKey(1) # Required or else video stream doesn't really render.
+        cv2.waitKey(1)  # Required or else video stream doesn't really render.
 
     if recognized_users_count:
         recognized_user = max(recognized_users_count,
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     parser.add_argument("--show", "-s", action="store_true",
                         help="Include this argument to have the image shown to you.", default=False)
     args = parser.parse_args()
-    user = recognize_user(encoding_model=args.model, encodings=load_encodings(args.encodings), image_flip=args.flip,
+    user = recognize_user(known_faces=load_encodings(args.encodings), encoding_model=args.model, image_flip=args.flip,
                           draw_rectangles=args.show)
     if user:
         print(f"Recognized user {user}.")
