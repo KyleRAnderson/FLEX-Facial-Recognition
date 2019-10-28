@@ -93,8 +93,7 @@ def recognize_user(encodings_location: str = "./encodings.pickle", encoding_mode
     track of how many times each user was recognized."""
     recognized_users_count = {}
     recognized_user = None
-    # video_stream = start_video_stream(0) # TODO add back
-    video_stream = VideoStream(src=0).start() # TODO remove
+    video_stream = start_video_stream(0)
     known_faces = load_encodings(encodings_location)
 
     # Determine the time at which we will time out. Equal to current time + timeout.
