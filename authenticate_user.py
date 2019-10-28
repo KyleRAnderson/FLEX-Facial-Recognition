@@ -5,31 +5,22 @@ Methods for authenticating a user.
 from imutils.video import VideoStream
 import face_recognition
 import imutils
-import pickle
 import time
 import cv2
+
+import common
+from data_handler import load_database
 
 # How long to wait before timing out and saying failed authentication.
 TIMEOUT: float = 30.0
 # Minimum number of frames in which a user must be recognized in order to be authenticated.
 MIN_USER_RECOGNITION_COUNT = 10
-image_writer = None
-USER_IDS_KEY: str = "names" # TODO change
+USER_IDS_KEY: str = "user_ids"
 
 
 def load_encodings(file_location: str):
     """Loads the encodings for faces from the given file location."""
-    with open(file_location, "rb") as encodings_file:
-        encodings = pickle.loads(encodings_file.read())
-    return encodings
-
-
-def start_video_stream(camera: int):
-    """Starts the video stream and returns the created stream. 
-    Also waits for the video stream to open before returning it."""
-    video_stream = VideoStream(src=camera).start()
-    time.sleep(2.0)
-    return video_stream
+    return load_database(file_location)
 
 
 def determine_identity(face_encoding, known_faces):
@@ -77,15 +68,10 @@ def draw_rectanges_and_user_ids(image_frame, conversion: float, boxes, user_ids:
             # Find the top so we can put the text there.
             y = top - 15 if top - 15 > 15 else top + 15
             cv2.putText(image_frame, user_id, (left, y), cv2.FONT_HERSHEY_PLAIN, 0.75, (0, 255, 0), 2)
-    display_frame(image_frame)
+    common.display_frame(image_frame)
 
 
-def display_frame(frame):
-    """Displays the frame to the user."""
-    cv2.imshow("Frame", frame)
-
-
-def recognize_user(encodings_location: str = "./encodings.pickle", encoding_model: str = "hog", image_flip: int = None,
+def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: int = None,
                    draw_rectangles=False):
     """Attempts to recognize a user.
     Returns the ID of the user if identified, or None if no users are identified.
@@ -93,9 +79,7 @@ def recognize_user(encodings_location: str = "./encodings.pickle", encoding_mode
     track of how many times each user was recognized."""
     recognized_users_count = {}
     recognized_user = None
-    # video_stream = start_video_stream(0) # TODO add back
-    video_stream = VideoStream(src=0).start() # TODO remove
-    known_faces = load_encodings(encodings_location)
+    video_stream = common.start_video_stream(0)
 
     # Determine the time at which we will time out. Equal to current time + timeout.
     timeout_time: float = time.time() + TIMEOUT
@@ -158,7 +142,7 @@ if __name__ == "__main__":
     parser.add_argument("--show", "-s", action="store_true",
                         help="Include this argument to have the image shown to you.", default=False)
     args = parser.parse_args()
-    user = recognize_user(encoding_model=args.model, encodings_location=args.encodings, image_flip=args.flip,
+    user = recognize_user(encoding_model=args.model, encodings=load_encodings(args.encodings), image_flip=args.flip,
                           draw_rectangles=args.show)
     if user:
         print(f"Recognized user {user}.")
