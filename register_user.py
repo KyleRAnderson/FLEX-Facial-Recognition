@@ -1,12 +1,13 @@
 """
 Creates a facial recognition profile for a new user.
 """
+import os
+
+import cv2
+import face_recognition
+
 import common
 import data_handler
-from common import USER_IDS_KEY, start_video_stream
-import face_recognition
-import cv2
-import os
 
 
 def process_image(image, encoding_model: str = "hog"):
@@ -21,7 +22,8 @@ def process_image(image, encoding_model: str = "hog"):
     # Detect the coordinates of the boxes corresponding to faces in the input image
     boxes = face_recognition.face_locations(image_rgb, model=encoding_model)
     # Actually make the encodings for the face.
-    return face_recognition.face_encodings(image_rgb, boxes)
+    # Only want the first recognized face
+    return face_recognition.face_encodings(image_rgb, [boxes[0]]) if boxes and len(boxes) > 0 else []
 
 
 def register_user(user_id: str, dataset_dir: str, encoding_model="hog", database_loc: str = common.DATABASE_LOC,
@@ -41,11 +43,11 @@ def register_user(user_id: str, dataset_dir: str, encoding_model="hog", database
         # Might want to check file validity here at some point, but won't for now.
         image = cv2.imread(full_path)
         if image is not None:
-            processed = process_image(image, encoding_model=encoding_model)
             if show_output:
                 print(f"Processing image {i + 1}")
+            processed = process_image(image, encoding_model=encoding_model)
             if processed:
-                processed_images.append(processed)
+                processed_images.extend(processed)
 
     if len(processed_images) > 0:  # Only do things if we actually have stuff to add.
         user_info = data_handler.load_database(database_loc)

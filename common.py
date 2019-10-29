@@ -3,7 +3,6 @@ import time
 import cv2
 from imutils.video import VideoStream
 
-USER_IDS_KEY = "user_ids"
 DATABASE_LOC = "./dataset/faces.pickle"
 
 
