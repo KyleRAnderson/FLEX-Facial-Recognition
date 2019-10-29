@@ -82,7 +82,7 @@ def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: i
     timeout_time: float = time.time() + TIMEOUT
     while time.time() < timeout_time:
         # Read a image_frame from the video stream.
-        image_frame = video_stream.read()
+        ret, image_frame = video_stream.read()
         if image_flip is not None:
             image_frame = cv2.flip(image_frame, image_flip)
 
