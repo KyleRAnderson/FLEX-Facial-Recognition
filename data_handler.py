@@ -29,4 +29,4 @@ def write_database(output_file: str, database_content: dict) -> None:
     """
     if output_file and database_content and database_content is not None:
         with open(output_file, "wb") as output:
-            output.write(pickle.dump(database_content, output))
+            pickle.dump(database_content, output)
