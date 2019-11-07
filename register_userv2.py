@@ -35,7 +35,8 @@ def find_best_match(faces, image, min_confidence: float = 0.5):
     best_match = None
 
     if len(faces) > 0:
-        # Assume that each image has only one face, so take the bounding box with the largest probability of being a face.
+        # Assume that each image has only one face, so take the bounding box with the largest probability of being a
+        # face.
         i = numpy.argmax(faces[0, 0, :, 2])
         confidence = faces[0, 0, i, 2]
 
@@ -117,7 +118,7 @@ def process_dataset(directory_location: str, detector_dir: str = common.FACE_DET
             if facial_embeddings is not None and len(facial_embeddings) > 0:
                 if current_user_id not in result_database:
                     result_database[current_user_id] = []
-                result_database[current_user_id].append(facial_embeddings)
+                result_database[current_user_id].append(facial_embeddings.flatten())
 
     if file_output is not None:
         data_handler.write_database(file_output, result_database)
@@ -130,8 +131,10 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Registers users' facial encodings from a dataset of images containing their face.")
-    parser.add_argument("dataset", type=str, help="Location of the dataset which should be processed.")
-    parser.add_argument("output", type=str,
-                        help="Location of the output pickle database file to which the encodings should be written.")
+    parser.add_argument("--dataset", "-d", type=str, help="Location of the dataset which should be processed.",
+                        default=common.DATASET_DIR)
+    parser.add_argument("--output", "-o", type=str,
+                        help="Location of the output pickle database file to which the encodings should be written.",
+                        default=common.EMBEDDINGS_LOC)
     args = parser.parse_args()
     process_dataset(args.dataset, show_output=True, file_output=args.output)

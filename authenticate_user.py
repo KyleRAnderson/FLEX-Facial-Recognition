@@ -1,7 +1,7 @@
 """
 Methods for authenticating a user.
 """
-
+import os
 import time
 
 import cv2
@@ -21,6 +21,22 @@ USER_IDS_KEY: str = "user_ids"
 def load_encodings(file_location: str):
     """Loads the encodings for faces from the given file location."""
     return load_database(file_location)
+
+
+def find_faces(grey, face_cascade: cv2.CascadeClassifier):
+    """
+    Finds the faces in the given image frame.
+    :param grey: The greyscale image.
+    :param face_cascade: The face cascade to be used for recognition.
+    :return: The face cascade classifier.
+    """
+    return face_cascade.detectMultiScale(
+        grey,
+        scaleFactor=1.1,
+        minNeighbors=5,
+        minSize=(30, 30),
+        flags=cv2.CASCADE_SCALE_IMAGE
+    )
 
 
 def determine_identity(face_encoding, known_faces):
@@ -51,7 +67,7 @@ def check_recognized_users(recognized_user_counts):
     return recognized_users
 
 
-def draw_rectanges_and_user_ids(image_frame, conversion: float, box_user_id_map: dict):
+def draw_rectangles_and_user_ids(image_frame, conversion: float, box_user_id_map: dict):
     """Draws the rectangles and user_ids onto the video stream so anyone viewing the stream could see them."""
     if box_user_id_map and len(box_user_id_map) > 0:
         for ((top, right, bottom, left), user_id) in box_user_id_map.items():
@@ -78,38 +94,34 @@ def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: i
     recognized_user = None
     video_stream = common.start_video_stream(0)
 
+    # TODO get this
+    face_cascade = common.load_cascade(os.path.join(common.CASCADE_DIR, "haarcascade_frontalface_default.xml"))
+
     # Determine the time at which we will time out. Equal to current time + timeout.
     timeout_time: float = time.time() + TIMEOUT
     while time.time() < timeout_time:
-        # Read a image_frame from the video stream.
-        ret, image_frame = video_stream.read()
-        if image_flip is not None:
-            image_frame = cv2.flip(image_frame, image_flip)
+        # Step 1: Image processing before we even get started with facial recognition.
+        grey, image_frame, r = process_next_image(video_stream, image_flip)
 
-        # Convert input from BGR to RGB
-        cv2.cvtColor(image_frame, cv2.COLOR_BGR2RGB)
-        # Resize image to width of 750 PX to speed up processing.
-        rgb_image = imutils.resize(image_frame, width=750)
-        r = image_frame.shape[1] / float(rgb_image.shape[1])
+        # Step 2: Detect locations of images.
+        boxes = find_faces(grey, face_cascade)
 
-        # Detect the location of each face and determine the boxes in which they lie
-        boxes = face_recognition.face_locations(
-            rgb_image, model=encoding_model)
         # Compute the facial embeddings (the encoding) at
         # each of the locations found in the previous line.
-        encodings = face_recognition.face_encodings(rgb_image, boxes)
-
-        box_user_id_mapping = {}
-        for (i, encoding) in enumerate(encodings):
-            user_id: str = determine_identity(encoding, known_faces)
-            if user_id:
-                if user_id not in recognized_users_count:
-                    recognized_users_count[user_id] = 0
-                recognized_users_count[user_id] += 1
-                box_user_id_mapping[boxes[i]] = user_id
+        # encodings = face_recognition.face_encodings(grey, boxes)
+        #
+        # box_user_id_mapping = {}
+        # for (i, encoding) in enumerate(encodings):
+        #     user_id: str = determine_identity(encoding, known_faces)
+        #     if user_id:
+        #         if user_id not in recognized_users_count:
+        #             recognized_users_count[user_id] = 0
+        #         recognized_users_count[user_id] += 1
+        #         box_user_id_mapping[boxes[i]] = user_id
 
         if draw_rectangles:
-            draw_rectanges_and_user_ids(image_frame, r, box_user_id_mapping)
+            # draw_rectangles_and_user_ids(image_frame, r, box_user_id_mapping)
+            draw_rectangles_and_user_ids(image_frame, r, {box: "unknown" for box in boxes})
 
         # Now check if we have already positively identified a user enough times
         recognized_users = check_recognized_users(recognized_users_count)
@@ -123,6 +135,25 @@ def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: i
         if recognized_users_count[recognized_user] < MIN_USER_RECOGNITION_COUNT:
             recognized_user = None
     return recognized_user
+
+
+def process_next_image(video_stream, image_flip: int = None):
+    """
+    Processes the next image on the given video stream.
+    :param video_stream: The video stream.
+    :param image_flip: The integer way in which to flip the image if it will need flipping.
+    :return: A tuple of three elements: the processed greyscale image, the original read image and the r ratio.
+    """
+    # Read a image_frame from the video stream.
+    ret, image_frame = video_stream.read()
+    if image_flip is not None:
+        image_frame = cv2.flip(image_frame, image_flip)
+    # Convert input from BGR to RGB
+    grey = cv2.cvtColor(image_frame, cv2.COLOR_BGR2RGB)
+    # Resize image to width of 750 PX to speed up processing.
+    grey = imutils.resize(grey, width=750)
+    r = image_frame.shape[1] / float(grey.shape[1])
+    return grey, image_frame, r
 
 
 # If this program is the main program, authenticate the user.

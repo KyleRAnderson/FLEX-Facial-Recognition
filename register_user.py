@@ -26,7 +26,7 @@ def process_image(image, encoding_model: str = "hog"):
     return face_recognition.face_encodings(image_rgb, [boxes[0]]) if boxes and len(boxes) > 0 else []
 
 
-def register_user(user_id: str, dataset_dir: str, encoding_model="hog", database_loc: str = common.DATABASE_LOC,
+def register_user(user_id: str, dataset_dir: str, encoding_model="hog", database_loc: str = common.EMBEDDINGS_LOC,
                   show_output: bool = False):
     """
     Function for registering a new user using the given video source. If video source isn't provided, then the camera

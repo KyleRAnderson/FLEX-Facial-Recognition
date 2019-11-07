@@ -3,7 +3,9 @@ import os
 import cv2
 
 DATA_DIR = "./data"
-DATABASE_LOC = os.path.join(DATA_DIR, "faces.pickle")
+DATASET_DIR = "./dataset"
+EMBEDDINGS_LOC = os.path.join(DATA_DIR, "embeddings.pickle")
+RECOGNITION_DATABASE_LOC = os.path.join(DATA_DIR, "recognition.pickle")
 CASCADE_DIR = "./cascades"
 # Output location for pickle database files
 OUTPUT_DIR = "./output"
