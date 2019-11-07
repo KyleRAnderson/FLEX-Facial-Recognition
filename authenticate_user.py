@@ -125,8 +125,9 @@ def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: i
 
 def recognize_user_from_database(database_loc: str = common.EMBEDDINGS_LOC, encoding_model: str = "hog",
                                  image_flip: int = None, draw_rectangles: bool = False):
-    return recognize_user(data_handler.load_database(database_loc), encoding_model=encoding_model, image_flip=image_flip,
-                   draw_rectangles=draw_rectangles)
+    return recognize_user(data_handler.load_database(database_loc), encoding_model=encoding_model,
+                          image_flip=image_flip,
+                          draw_rectangles=draw_rectangles)
 
 
 # If this program is the main program, authenticate the user.
