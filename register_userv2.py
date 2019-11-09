@@ -135,6 +135,6 @@ if __name__ == "__main__":
                         default=common.DATASET_DIR)
     parser.add_argument("--output", "-o", type=str,
                         help="Location of the output pickle database file to which the encodings should be written.",
-                        default=common.EMBEDDINGS_LOC)
+                        default=common.DATABASE_LOC)
     args = parser.parse_args()
     process_dataset(args.dataset, show_output=True, file_output=args.output)

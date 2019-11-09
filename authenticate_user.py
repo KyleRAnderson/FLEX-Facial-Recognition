@@ -123,8 +123,16 @@ def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: i
     return recognized_user
 
 
-def recognize_user_from_database(database_loc: str = common.EMBEDDINGS_LOC, encoding_model: str = "hog",
+def recognize_user_from_database(database_loc: str = common.DATABASE_LOC, encoding_model: str = "hog",
                                  image_flip: int = None, draw_rectangles: bool = False):
+    """
+    Recognizes a user
+    :param database_loc: The database containing the face encodings for users.
+    :param encoding_model: The encoding model to be used for recognition.
+    :param image_flip: The type of image flip to be applied to the image, if it will be upside-down or horizontally inverted.
+    :param draw_rectangles: True to draw the rectangles to the screen, false otherwise.
+    :return: The recognized user's id, or None if no user was recognized.
+    """
     return recognize_user(data_handler.load_database(database_loc), encoding_model=encoding_model,
                           image_flip=image_flip,
                           draw_rectangles=draw_rectangles)

@@ -89,7 +89,7 @@ def register_users_in_dir(directory_location: str, encoding_model: str = "hog", 
 
 
 def register_users_and_save(directory_location: str = common.DATASET_DIR,
-                            database_location: str = common.EMBEDDINGS_LOC, encoding_model="hog",
+                            database_location: str = common.DATABASE_LOC, encoding_model="hog",
                             delete_images_on_complete: bool = True, show_output: bool = False,
                             overwrite_data: bool = False):
     processed_users = register_users_in_dir(directory_location, encoding_model=encoding_model,

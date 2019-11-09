@@ -9,7 +9,7 @@ from sklearn.svm import SVC
 import common
 import data_handler
 
-def train_and_save(facial_embeddings_database: str= common.EMBEDDINGS_LOC, output_file: str = common.RECOGNITION_DATABASE_LOC) -> None:
+def train_and_save(facial_embeddings_database: str= common.DATABASE_LOC, output_file: str = common.RECOGNITION_DATABASE_LOC) -> None:
     """
     Trains the database using the given facial embeddings database and outputs the results to file.
     :param facial_embeddings_database: The facial embedding database location.

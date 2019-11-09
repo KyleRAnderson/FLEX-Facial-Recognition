@@ -2,13 +2,9 @@ import os
 
 import cv2
 
-DATA_DIR = "./data"
-DATASET_DIR = "./dataset"
-EMBEDDINGS_LOC = os.path.join(DATA_DIR, "embeddings.pickle")
-RECOGNITION_DATABASE_LOC = os.path.join(DATA_DIR, "recognition.pickle")
-CASCADE_DIR = "./cascades"
-# Output location for pickle database files
-OUTPUT_DIR = "./output"
+DATA_DIR = "data"
+DATASET_DIR = "dataset"
+DATABASE_LOC = os.path.join(DATA_DIR, "database.pickle")
 
 RES_DIRECTORY = "./res"
 # Directory for the face detection model.
