@@ -23,7 +23,7 @@ def load_encodings(file_location: str):
     return data_handler.load_database(file_location)
 
 
-def determine_identity(face_encoding, known_faces):
+def determine_identity(face_encoding, known_faces) -> str:
     """
     "Determines the most likely identity of a single face. Returns the user id.
     :param face_encoding: The encoding which needs identification.
@@ -36,8 +36,10 @@ def determine_identity(face_encoding, known_faces):
         # Count the number of occurrences of true.
         recognized_users[user_id] = matches.count(True)
 
-    matched_user: str = max(recognized_users,
-                            key=recognized_users.get)
+    matched_user = ""
+    if len(recognized_users) > 0:
+        matched_user: str = max(recognized_users,
+                                key=recognized_users.get)
     return matched_user
 
 

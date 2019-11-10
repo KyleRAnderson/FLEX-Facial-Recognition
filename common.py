@@ -6,7 +6,7 @@ DATA_DIR = "data"
 DATASET_DIR = "dataset"
 DATABASE_LOC = os.path.join(DATA_DIR, "database.pickle")
 
-RES_DIRECTORY = "./res"
+RES_DIRECTORY = "res"
 # Directory for the face detection model.
 FACE_DETECTION_MODEL_DIR = os.path.join(RES_DIRECTORY, "face_detection_model")
 EMBEDDINGS_PROCESSOR_LOC = os.path.join(RES_DIRECTORY, "openface_nn4.small2.v1.t7")
