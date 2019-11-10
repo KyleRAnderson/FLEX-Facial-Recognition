@@ -5,6 +5,8 @@ import cv2
 DATA_DIR = "data"
 DATASET_DIR = "dataset"
 DATABASE_LOC = os.path.join(DATA_DIR, "database.pickle")
+# Name for the display frame.
+FRAME_NAME = "Frame"
 
 RES_DIRECTORY = "res"
 # Directory for the face detection model.
@@ -14,7 +16,7 @@ EMBEDDINGS_PROCESSOR_LOC = os.path.join(RES_DIRECTORY, "openface_nn4.small2.v1.t
 
 def display_frame(frame):
     """Displays the frame to the user."""
-    cv2.imshow("Frame", frame)
+    cv2.imshow(FRAME_NAME, frame)
 
 
 def start_video_stream(camera: int):

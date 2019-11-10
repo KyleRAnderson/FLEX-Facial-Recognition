@@ -74,9 +74,10 @@ def draw_rectangles_and_user_ids(image_frame, conversion: float, box_user_id_map
 
 def run_face_recognition(frame, known_faces: dict, encoding_model: str = "hog", draw_rectangles: bool = False) -> list:
     recognized_user_ids: list = []
+    original_frame = frame
 
     # Convert input from BGR to RGB
-    cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     # Resize image to width of 750 PX to speed up processing.
     rgb_image = imutils.resize(frame, width=750)
     r = frame.shape[1] / float(rgb_image.shape[1])
@@ -96,7 +97,7 @@ def run_face_recognition(frame, known_faces: dict, encoding_model: str = "hog", 
             recognized_user_ids.append(user_id)
 
     if draw_rectangles:
-        draw_rectangles_and_user_ids(frame, r, box_user_id_mapping)
+        draw_rectangles_and_user_ids(original_frame, r, box_user_id_mapping)
 
     return recognized_user_ids
 
