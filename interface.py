@@ -26,8 +26,8 @@ def register_user(base_dir: str = os.getcwd()) -> None:
     :param base_dir: The base directory, from which all default paths are relative. Defaults to current working directory.
     :return: None
     """
-    register.register_users_and_save(directory_location=os.path.join(base_dir, common.DATABASE_LOC),
-                                     delete_images_on_complete=True, overwrite_data=False)
+    register.register_users_from_dir_and_save(directory_location=os.path.join(base_dir, common.DATABASE_LOC),
+                                              delete_images_on_complete=True, overwrite_data=False)
 
 
 if __name__ == "__main__":
