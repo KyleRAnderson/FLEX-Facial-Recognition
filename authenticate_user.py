@@ -174,7 +174,7 @@ if __name__ == "__main__":
 
     args_dict = {}
     if args.encodings is not None:
-        args_dict["encodings_location"] = args.encodings
+        args_dict["database_loc"] = args.encodings
     if args.model is not None:
         args_dict["encoding_model"] = args.model
 
