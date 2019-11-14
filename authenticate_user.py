@@ -23,7 +23,7 @@ def load_encodings(file_location: str):
     return data_handler.load_database(file_location)
 
 
-def determine_identity(face_encoding, known_faces):
+def determine_identity(face_encoding, known_faces) -> str:
     """
     "Determines the most likely identity of a single face. Returns the user id.
     :param face_encoding: The encoding which needs identification.
@@ -33,11 +33,15 @@ def determine_identity(face_encoding, known_faces):
     recognized_users = {}
     for (user_id, user_encodings) in known_faces.items():
         matches = face_recognition.compare_faces(user_encodings, face_encoding)
-        # Count the number of occurrences of true.
-        recognized_users[user_id] = matches.count(True)
+        count = matches.count(True)
+        if count > 0:
+            # Count the number of occurrences of true.
+            recognized_users[user_id] = count
 
-    matched_user: str = max(recognized_users,
-                            key=recognized_users.get)
+    matched_user = ""
+    if len(recognized_users) > 0:
+        matched_user: str = max(recognized_users,
+                                key=recognized_users.get)
     return matched_user
 
 
@@ -68,8 +72,38 @@ def draw_rectangles_and_user_ids(image_frame, conversion: float, box_user_id_map
     common.display_frame(image_frame)
 
 
+def run_face_recognition(frame, known_faces: dict, encoding_model: str = "hog", draw_rectangles: bool = False) -> list:
+    recognized_user_ids: list = []
+    original_frame = frame
+
+    # Convert input from BGR to RGB
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    # Resize image to width of 750 PX to speed up processing.
+    rgb_image = imutils.resize(frame, width=750)
+    r = frame.shape[1] / float(rgb_image.shape[1])
+
+    # Detect the location of each face and determine the boxes in which they lie
+    boxes = face_recognition.face_locations(
+        rgb_image, model=encoding_model)
+    # Compute the facial embeddings (the encoding) at
+    # each of the locations found in the previous line.
+    encodings = face_recognition.face_encodings(rgb_image, boxes)
+
+    box_user_id_mapping = {}
+    for (i, encoding) in enumerate(encodings):
+        user_id: str = determine_identity(encoding, known_faces)
+        if user_id:
+            box_user_id_mapping[boxes[i]] = user_id
+            recognized_user_ids.append(user_id)
+
+    if draw_rectangles:
+        draw_rectangles_and_user_ids(original_frame, r, box_user_id_mapping)
+
+    return recognized_user_ids
+
+
 def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: int = None,
-                   draw_rectangles=False):
+                   draw_rectangles: bool = False):
     """Attempts to recognize a user.
     Returns the ID of the user if identified, or None if no users are identified."""
     recognized_users_count = {}
@@ -84,30 +118,12 @@ def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: i
         if image_flip is not None:
             image_frame = cv2.flip(image_frame, image_flip)
 
-        # Convert input from BGR to RGB
-        cv2.cvtColor(image_frame, cv2.COLOR_BGR2RGB)
-        # Resize image to width of 750 PX to speed up processing.
-        rgb_image = imutils.resize(image_frame, width=750)
-        r = image_frame.shape[1] / float(rgb_image.shape[1])
-
-        # Detect the location of each face and determine the boxes in which they lie
-        boxes = face_recognition.face_locations(
-            rgb_image, model=encoding_model)
-        # Compute the facial embeddings (the encoding) at
-        # each of the locations found in the previous line.
-        encodings = face_recognition.face_encodings(rgb_image, boxes)
-
-        box_user_id_mapping = {}
-        for (i, encoding) in enumerate(encodings):
-            user_id: str = determine_identity(encoding, known_faces)
-            if user_id:
-                if user_id not in recognized_users_count:
-                    recognized_users_count[user_id] = 0
-                recognized_users_count[user_id] += 1
-                box_user_id_mapping[boxes[i]] = user_id
-
-        if draw_rectangles:
-            draw_rectangles_and_user_ids(image_frame, r, box_user_id_mapping)
+        recognized_user_ids = run_face_recognition(image_frame, known_faces, encoding_model=encoding_model,
+                                                   draw_rectangles=draw_rectangles)
+        for user_id in recognized_user_ids:
+            if user_id not in recognized_users_count:
+                recognized_users_count[user_id] = 0
+            recognized_users_count[user_id] += 1
 
         # Now check if we have already positively identified a user enough times
         recognized_users = check_recognized_users(recognized_users_count)
@@ -158,7 +174,7 @@ if __name__ == "__main__":
 
     args_dict = {}
     if args.encodings is not None:
-        args_dict["encodings_location"] = args.encodings
+        args_dict["database_loc"] = args.encodings
     if args.model is not None:
         args_dict["encoding_model"] = args.model
 
