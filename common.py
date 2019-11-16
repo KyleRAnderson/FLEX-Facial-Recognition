@@ -22,7 +22,7 @@ def display_frame(frame):
 def start_video_stream(camera: int):
     """Starts the video stream and returns the created stream.
     Also waits for the video stream to open before returning it."""
-    video_stream = cv2.VideoCapture(0)
+    video_stream = cv2.VideoCapture(camera)
     return video_stream
 
 
