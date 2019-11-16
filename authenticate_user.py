@@ -15,7 +15,6 @@ import data_handler
 TIMEOUT: float = 30.0
 # Minimum number of frames in which a user must be recognized in order to be authenticated.
 MIN_USER_RECOGNITION_COUNT = 10
-USER_IDS_KEY: str = "user_ids"
 DEFAULT_CAMERA: int = 0
 DEFAULT_WIDTH: int = 275
 
