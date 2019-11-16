@@ -15,7 +15,9 @@ import data_handler
 TIMEOUT: float = 30.0
 # Minimum number of frames in which a user must be recognized in order to be authenticated.
 MIN_USER_RECOGNITION_COUNT = 10
+IMAGE_WIDTH: int = 375
 USER_IDS_KEY: str = "user_ids"
+camera: int = 0
 
 
 def load_encodings(file_location: str):
@@ -78,8 +80,8 @@ def run_face_recognition(frame, known_faces: dict, encoding_model: str = "hog", 
 
     # Convert input from BGR to RGB
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    # Resize image to width of 750 PX to speed up processing.
-    rgb_image = imutils.resize(frame, width=750)
+    # Resize image to speed up processing.
+    rgb_image = imutils.resize(frame, width=IMAGE_WIDTH)
     r = frame.shape[1] / float(rgb_image.shape[1])
 
     # Detect the location of each face and determine the boxes in which they lie
@@ -108,7 +110,7 @@ def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: i
     Returns the ID of the user if identified, or None if no users are identified."""
     recognized_users_count = {}
     recognized_user = None
-    video_stream = common.start_video_stream(0)
+    video_stream = common.start_video_stream(camera)
 
     # Determine the time at which we will time out. Equal to current time + timeout.
     timeout_time: float = time.time() + TIMEOUT
@@ -118,8 +120,11 @@ def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: i
         if image_flip is not None:
             image_frame = cv2.flip(image_frame, image_flip)
 
+        face_recognition_start = time.time()  # TODO remove
         recognized_user_ids = run_face_recognition(image_frame, known_faces, encoding_model=encoding_model,
                                                    draw_rectangles=draw_rectangles)
+        print(f"Face recognition: {time.time() - face_recognition_start}")  # TODO remove
+
         for user_id in recognized_user_ids:
             if user_id not in recognized_users_count:
                 recognized_users_count[user_id] = 0
@@ -170,6 +175,8 @@ if __name__ == "__main__":
                         required=False, default=None, choices=[0, 1])
     parser.add_argument("--show", "-s", action="store_true",
                         help="Include this argument to have the image shown to you.", default=False)
+    parser.add_argument("--camera", "-c", default=None, type=int, required=False,
+                        help="Which camera to be used during authentication.")
     args = parser.parse_args()
 
     args_dict = {}
@@ -177,6 +184,9 @@ if __name__ == "__main__":
         args_dict["database_loc"] = args.encodings
     if args.model is not None:
         args_dict["encoding_model"] = args.model
+
+    if args.camera is not None:
+        camera = args.camera
 
     user = recognize_user_from_database(**args_dict, image_flip=args.flip,
                                         draw_rectangles=args.show)
