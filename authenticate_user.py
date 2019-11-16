@@ -131,10 +131,8 @@ def recognize_user(known_faces: dict, encoding_model: str = "hog", image_flip: i
         if image_flip is not None:
             image_frame = cv2.flip(image_frame, image_flip)
 
-        face_recognition_start = time.time()  # TODO remove
         recognized_user_ids = run_face_recognition(image_frame, known_faces, encoding_model=encoding_model,
                                                    draw_rectangles=draw_rectangles, image_width=image_width)
-        print(f"Face recognition: {time.time() - face_recognition_start}")  # TODO remove
 
         for user_id in recognized_user_ids:
             if user_id not in recognized_users_count:
