@@ -190,7 +190,8 @@ if __name__ == "__main__":
     parser.add_argument("--camera", "-c", type=int, required=False,
                         help="Which camera to be used during authentication.", default=DEFAULT_CAMERA)
     parser.add_argument("--width", "-w", type=int, required=False,
-                        help=f"The image width to use, in pixels. Default is {DEFAULT_WIDTH} pixels.")
+                        help=f"The image width to use, in pixels. Default is {DEFAULT_WIDTH} pixels.",
+                        default=DEFAULT_WIDTH)
     args = parser.parse_args()
 
     args_dict = {}
