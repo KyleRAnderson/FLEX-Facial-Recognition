@@ -34,7 +34,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="API Interface Options")
-    parser.add_argument("--base-dir", type=str, required=False, default=None,
+    parser.add_argument("--base-dir", type=str, required=False, default="./",
                         help="The directory from which the save locations should be relative.")
     parser.add_argument("--authenticate", required=False, default=False, action="store_true",
                         help="Present this argument to authenticate a user.")
@@ -44,6 +44,8 @@ if __name__ == "__main__":
 
     kwargs = dict(base_dir=args.base_dir)
     if args.register:
-        register_user(**{arg_name: arg for (arg_name, arg) in kwargs.items() if args is not None})
+        register_user(**{arg_name: arg for (arg_name, arg)
+                         in kwargs.items() if args is not None})
     elif args.authenticate:
-        print(authenticate_user(**{arg_name: arg for (arg_name, arg) in kwargs.items() if arg is not None}))
+        print(authenticate_user(
+            **{arg_name: arg for (arg_name, arg) in kwargs.items() if arg is not None}))
