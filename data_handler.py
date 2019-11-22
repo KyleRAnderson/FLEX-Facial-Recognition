@@ -2,6 +2,7 @@
 General IO for pickle database operations.
 """
 
+import os
 import pickle
 
 
@@ -49,5 +50,8 @@ def write_database(output_file: str, database_content) -> None:
     :return: None
     """
     if output_file and database_content and database_content is not None:
+        directory: str = os.path.dirname(output_file)
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
         with open(output_file, "wb") as output:
             pickle.dump(database_content, output)
