@@ -31,7 +31,7 @@ def register_user(base_dir: str = os.getcwd()) -> None:
 
 
 if __name__ == "__main__":
-    import argparse
+    import argparse, sys
 
     parser = argparse.ArgumentParser(description="API Interface Options")
     parser.add_argument("--base-dir", type=str, required=False, default="./",
@@ -40,7 +40,11 @@ if __name__ == "__main__":
                         help="Present this argument to authenticate a user.")
     parser.add_argument("--register", required=False, default=False, action="store_true",
                         help="Present this argument to register a user.")
-    args = parser.parse_args()
+
+    if len(sys.argv) <= 1:
+        args = parser.parse_args(input().split(" "))
+    else:
+        args = parser.parse_args()
 
     kwargs = dict(base_dir=args.base_dir)
     if args.register:
