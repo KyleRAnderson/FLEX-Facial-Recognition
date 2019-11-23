@@ -51,5 +51,7 @@ if __name__ == "__main__":
         register_user(**{arg_name: arg for (arg_name, arg)
                          in kwargs.items() if args is not None})
     elif args.authenticate:
-        print(authenticate_user(
-            **{arg_name: arg for (arg_name, arg) in kwargs.items() if arg is not None}))
+        user_id: str = authenticate_user(
+            **{arg_name: arg for (arg_name, arg) in kwargs.items() if arg is not None})
+        if user_id:
+            print(user_id)

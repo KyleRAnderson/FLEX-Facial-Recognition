@@ -166,9 +166,11 @@ def recognize_user_from_database(database_loc: str = common.DATABASE_LOC, encodi
     Lower quality means faster but less reliable recognition.
     :return: The recognized user's id, or None if no user was recognized.
     """
-    return recognize_user(data_handler.load_database(database_loc), encoding_model=encoding_model,
-                          image_flip=image_flip,
-                          draw_rectangles=draw_rectangles, camera=camera, image_width=image_width)
+    database = data_handler.load_database(database_loc)
+    if len(database) > 0:
+        return recognize_user(database, encoding_model=encoding_model,
+                              image_flip=image_flip,
+                              draw_rectangles=draw_rectangles, camera=camera, image_width=image_width)
 
 
 # If this program is the main program, authenticate the user.
